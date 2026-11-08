@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ML-KEM Implicit-Rejection Assessment — Findings</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.55; color: #1a1a1a; max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.6em; margin-bottom: .2em; }
+  h2 { border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-top: 1.8em; }
+  code { background: #f2f2f2; padding: 1px 5px; border-radius: 3px; font-size: .92em; }
+  pre { background: #f6f6f6; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: .9em; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: .95em; }
+  th, td { border: 1px solid #ddd; padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: #f6f6f6; }
+  .verdict { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 12px 16px; border-radius: 6px; }
+  .sev-medium { background: #fff3e0; }
+  .sev-low { background: #f1f8e9; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: .82em; font-weight: 600; }
+  .pill-medium { background: #ffcc80; }
+  .pill-low { background: #c5e1a5; }
+  .muted { color: #555; font-size: .92em; }
+  footer { margin-top: 2.5em; color: #555; font-size: .9em; border-top: 1px solid #ddd; padding-top: 12px; }
+</style>
+</head>
+<body>
+<h1>ML-KEM Implicit-Rejection Assessment</h1>
+<p class="muted">FIPS 203 ML-KEM-768 &middot; Two independent implementations &middot;
+liboqs 0.16.0 (C) vs kyber-py 1.2.0 (pure Python)</p>
+
+<div class="verdict">
+<strong>Result: 19/19 differential cases PASS, 20/20 valid-encapsulation rounds PASS,
+zero cross-implementation disagreements — in two independent runs.</strong>
+For every rejected 1088-byte ciphertext, both implementations return the same
+32-byte secret, and it equals the implicit-rejection fallback
+<code>K&#772; = J(z &#9553; c)</code> (SHAKE256) recomputed independently.
+Both implementations refuse a decapsulation key whose stored
+<code>H(ek)</code> fails the FIPS 203 &sect;7.3 hash check, and both refuse
+wrong-length ciphertexts and keys. No measurable success-vs-failure latency
+difference above noise was found in either implementation — which is a
+measurement result, <em>not</em> a proof of timing indistinguishability.
+</div>
+
+<h2>What was tested</h2>
+<p>Parameter set <strong>ML-KEM-768</strong> (ek 1184 B, dk 2400 B, ct 1088 B,
+ss 32 B). A deterministic test keypair (<code>key_derive</code> from a public
+seed) is shared by both implementations; a second, random liboqs-generated
+keypair is cross-checked in the other direction. The differential harness
+(<code>src/run_differential.py</code>) covers:</p>
+<ul>
+  <li><strong>Valid (1 case + 20 rounds):</strong> encapsulation under the test keypair;
+  both implementations must return the encapsulation shared secret, in both
+  directions (kyber-py encap, liboqs encap, liboqs keypair).</li>
+  <li><strong>Malformed (14):</strong> truncated ciphertexts (1087, 512, 1, 0 bytes),
+  extended ciphertexts (1089, 2048 bytes), single-bit flips at bytes 0, 543, 1024,
+  1087, all-zero, all-0xFF, and two seeded-random ciphertexts.</li>
+  <li><strong>Adversarial (4):</strong> a valid ciphertext under a <em>different</em>
+  keypair, u-part saturated to 0xFF, v-part saturated to 0xFF, u-part zeroed —
+  all crafted so the re-encryption check must fail.</li>
+  <li><strong>Input checks (6):</strong> corrupted stored <code>H(ek)</code> in the
+  decapsulation key, truncated/extended decapsulation keys (2399, 2401 bytes).</li>
+  <li><strong>Determinism:</strong> 5 repeated decapsulations of the same input per
+  implementation, valid and malformed.</li>
+  <li><strong>Timing:</strong> n=100 decapsulations per implementation per outcome
+  (success vs failure), wall-clock, AMD EPYC 9D25, Linux 7.0.0-43-generic x86_64.</li>
+</ul>
+<p>Logs contain SHA-256 digests of shared secrets and ciphertexts only — never
+raw shared secrets. Test keypairs are generated from a public seed; they are
+test vectors, not real keys.</p>
+
+<h2>Timing (n=100 per cell)</h2>
+<table>
+  <tr><th>Implementation</th><th>Run</th><th>Success median</th><th>Failure median</th><th>Median delta</th><th>Success p95</th><th>Failure p95</th></tr>
+  <tr><td>liboqs</td><td>run1</td><td>0.024808 ms</td><td>0.024802 ms</td><td>−0.000006 ms</td><td>0.033586 ms</td><td>0.033399 ms</td></tr>
+  <tr><td>liboqs</td><td>run2</td><td>0.025037 ms</td><td>0.025028 ms</td><td>−0.000009 ms</td><td>0.025180 ms</td><td>0.026358 ms</td></tr>
+  <tr><td>kyber-py</td><td>run1</td><td>7.557161 ms</td><td>7.579589 ms</td><td>+0.022428 ms</td><td>9.475211 ms</td><td>7.976014 ms</td></tr>
+  <tr><td>kyber-py</td><td>run2</td><td>7.433044 ms</td><td>7.477486 ms</td><td>+0.044442 ms</td><td>8.766325 ms</td><td>7.911753 ms</td></tr>
+</table>
+<p><strong>Limits.</strong> The deltas are a fraction of the run-to-run spread
+(kyber-py p95 varies by ~1.5 ms between runs; the success p95 exceeds the failure
+p95 in run1). These are wall-clock measurements of whole decapsulation calls on
+one shared virtual machine. They do <strong>not</strong> prove timing
+indistinguishability: no cache-timing, power/EM, contention, or other-CPU
+measurements were made, and a constant-time claim would require a dedicated
+side-channel evaluation.</p>
+
+<h2>Findings (severity-ranked)</h2>
+<table>
+  <tr><th>ID</th><th>Severity</th><th>Finding</th></tr>
+  <tr><td>F-01</td><td><span class="pill pill-medium">Medium</span></td>
+    <td><strong>liboqs <code>OQS_KEM_decaps</code> performs no ciphertext/key length check; callers must validate.</strong>
+    The C API takes bare pointers with no lengths (<code>src/kem/kem.h</code>: “Caller is responsible for
+    allocating sufficient memory”), so the FIPS 203 &sect;7.3 type checks cannot be performed by the library
+    function itself. The driver enforces them before calling (1087-byte ct refused;
+    2399/2401-byte dk refused). A caller passing a short buffer directly gets no refusal from the library.
+    <br><span class="muted">Evidence: <code>outputs/run1/differential-run.log</code> (input checks);
+    <code>src/mlkem-liboqs-driver.c</code>; liboqs 0.16.0 <code>src/kem/kem.h</code>.</span></td></tr>
+  <tr><td>F-02</td><td><span class="pill pill-low">Low</span></td>
+    <td><strong>Error-signalling conventions differ at the API boundary.</strong>
+    kyber-py raises <code>ValueError</code>; the liboqs path returns an error status
+    (<code>decaps returned -1</code> for a corrupted stored <code>H(ek)</code>) or a driver-level
+    refusal string for wrong lengths. Both refuse; integrators must handle both channels.
+    <br><span class="muted">Evidence: <code>outputs/run1/results.json</code>, <code>input_checks</code>.</span></td></tr>
+  <tr><td>F-03</td><td><span class="pill pill-low">Low</span></td>
+    <td><strong>Implicit rejection is byte-identical across implementations.</strong>
+    All 14 malformed and 4 adversarial 1088-byte ciphertexts return the same secret from both
+    implementations, equal to <code>J(z&#9553;c)</code> recomputed independently with
+    <code>hashlib.shake_256</code>. Valid encapsulations agree 20/20 rounds in both directions.
+    <br><span class="muted">Evidence: <code>outputs/run1/results.json</code>
+    (<code>expected_fallback_sha256</code> matches both implementations in every rejected case).</span></td></tr>
+  <tr><td>F-04</td><td><span class="pill pill-low">Low</span></td>
+    <td><strong>No success-vs-failure latency difference above noise.</strong>
+    See the timing table above. Measurement result only — not a proof of indistinguishability.</td></tr>
+  <tr><td>F-05</td><td><span class="pill pill-low">Low</span></td>
+    <td><strong>Both implementations perform the &sect;7.3 decapsulation-key hash check on every decapsulation.</strong>
+    A dk with corrupted stored <code>H(ek)</code> is refused by both. Source-confirmed: kyber-py
+    <code>_decaps_internal</code> raises; mlkem-native <code>mlk_kem_check_sk</code> returns
+    <code>MLK_ERR_FAIL</code> (called from <code>mlk_kem_dec</code>).
+    <br><span class="muted">Evidence: <code>outputs/run1/results.json</code>, <code>input_checks</code>;
+    <code>citations.md</code> &sect;3.</span></td></tr>
+</table>
+<p><strong>Not found:</strong> no case where the implementations disagreed on a returned
+secret; no rejected ciphertext returning anything other than <code>J(z&#9553;c)</code>;
+no correctly-sized input for which decapsulation returned an error instead of a
+32-byte secret; no timing delta above noise.</p>
+
+<h2>Reproduce</h2>
+<pre>./run_all.sh &lt;run-name&gt;</pre>
+<p>Builds liboqs 0.16.0 from the bundled tarball (SHA-256 verified), compiles the
+driver, installs kyber-py 1.2.0 from the bundled wheel (no network needed), and
+runs the differential harness into <code>outputs/&lt;run-name&gt;/</code>. A clean
+reproduction from a fresh copy of this repository is <code>outputs/run2/</code>;
+<code>outputs/run-comparison.log</code> confirms every verdict, agreement, fallback
+equality, and input-check outcome is identical between runs.</p>
+
+<h2>Files</h2>
+<ul>
+  <li><a href="../README.md">README.md</a> — full method, implementation table, alternatives considered</li>
+  <li><a href="../findings.md">findings.md</a> — severity-ranked findings with evidence locations</li>
+  <li><a href="../citations.md">citations.md</a> — primary sources (FIPS 203, liboqs, mlkem-native, kyber-py)</li>
+  <li><a href="../claims.md">claims.md</a> — claim-to-evidence index (each claim → script + output + digest)</li>
+  <li><a href="../evidence.json">evidence.json</a> — machine-readable summary</li>
+  <li><a href="../outputs/run1/differential-run.log">outputs/run1/differential-run.log</a> — unedited run log</li>
+  <li><a href="../outputs/run1/results.json">outputs/run1/results.json</a> — machine-readable results</li>
+  <li><a href="../outputs/run2/differential-run.log">outputs/run2/differential-run.log</a> — clean-reproduction run log</li>
+  <li><a href="../outputs/SHA256SUMS">outputs/SHA256SUMS</a> — checksums over all output files</li>
+</ul>
+
+<footer>
+ML-KEM implicit-rejection assessment &middot; FIPS 203 (August 2024), ML-KEM-768 &middot;
+liboqs 0.16.0 &middot; kyber-py 1.2.0 &middot; Runs: 2026-11-08 (UTC).
+</footer>
+</body>
+</html>
