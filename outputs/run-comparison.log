@@ -1,0 +1,9 @@
+timing (run1 -> run2, medians in ms):
+  liboqs-success: 0.024808 -> 0.025037
+  liboqs-failure: 0.024802 -> 0.025028
+  kyber-py-success: 7.557161 -> 7.433044
+  kyber-py-failure: 7.579589 -> 7.477486
+  liboqs delta: -6e-06 -> -9e-06
+  kyber-py delta: 0.022428 -> 0.044442
+
+REPRODUCIBILITY: all verdicts, agreements, fallback equalities and input-check outcomes identical between runs.
