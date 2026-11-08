@@ -1,0 +1,73 @@
+=== ML-KEM implicit-rejection differential run ===
+date_utc: 2026-11-08T15:07:59Z
+platform: Linux-7.0.0-43-generic-x86_64-with-glibc2.39  python: 3.12.3
+cpu: AMD EPYC 9D25 126-Core Processor
+liboqs driver: READY liboqs=0.16.0 alg=ML-KEM-768 ek=1184 dk=2400 ct=1088 ss=32
+kyber-py version: 1.2.0
+test seed (sha256 label): b38d8ed94837de87eca5dfce86194541a4963d92645ad026ad34f330d291686c
+timing_n=100 valid_n=20
+
+-- deterministic keypair (key_derive, seed = d||z, 64 bytes) --
+ek sha256: dd61cf5a492e66f67cfe00105c51e29d8a0d6f1f410d78206ac5d10feb7601f7
+dk sha256: bbcbe321dfd661ce55fba4af33586930ad99368a9c75ec73a49594a4b4125e3b
+dk hash check (FIPS 203 Sec. 7.3 step 3): True
+rejection key z sha256: cf9b506a0b0d8337e045cb2f3203bfcc1a037263de07171d031c8033eb1f8186
+
+-- liboqs-generated keypair (random) --
+ek sha256: 900aa9132a436b74b3c3ea0aab8bb45a8fc6b047e09d286567244d96a721185f  dk sha256: 579e14fe9765fa089c4a620420dd3c9cca12d073d2bf4add6cb4e2812c3c1532
+dk hash check: True
+
+-- valid encapsulation (kyber-py encap) --
+ct sha256: 3d6adeded3c06ff28577c8f555ef4c4a7404a45bd794e71c99b5ad72a616e3c0  ss sha256: 0073173d291d6e5965491106988ee022ce4bccb43124a362cba8b8884a8f37f0
+
+-- differential cases: 19 --
+valid-001                    valid        len= 1088 agree=True  verdict=PASS liboqs=0073173d291d kyberpy=0073173d291d
+malformed-trunc-1087         malformed    len= 1087 agree=False verdict=PASS liboqs=ValueError: ciphertext type check failed: expected 1088 bytes, got 1087 kyberpy=ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 1087')
+malformed-trunc-512          malformed    len=  512 agree=False verdict=PASS liboqs=ValueError: ciphertext type check failed: expected 1088 bytes, got 512 kyberpy=ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 512')
+malformed-trunc-1            malformed    len=    1 agree=False verdict=PASS liboqs=ValueError: ciphertext type check failed: expected 1088 bytes, got 1 kyberpy=ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 1')
+malformed-trunc-0            malformed    len=    0 agree=False verdict=PASS liboqs=ValueError: ciphertext type check failed: expected 1088 bytes, got 0 kyberpy=ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 0')
+malformed-ext-1089           malformed    len= 1089 agree=False verdict=PASS liboqs=ValueError: ciphertext type check failed: expected 1088 bytes, got 1089 kyberpy=ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 1089')
+malformed-ext-2048           malformed    len= 2048 agree=False verdict=PASS liboqs=ValueError: ciphertext type check failed: expected 1088 bytes, got 2048 kyberpy=ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 2048')
+malformed-flip-first         malformed    len= 1088 agree=True  verdict=PASS liboqs=799871b9b165 kyberpy=799871b9b165
+malformed-flip-mid           malformed    len= 1088 agree=True  verdict=PASS liboqs=48c556edc625 kyberpy=48c556edc625
+malformed-flip-last          malformed    len= 1088 agree=True  verdict=PASS liboqs=ac8029b37007 kyberpy=ac8029b37007
+malformed-flip-vpart         malformed    len= 1088 agree=True  verdict=PASS liboqs=be41067d75ee kyberpy=be41067d75ee
+malformed-all-zero           malformed    len= 1088 agree=True  verdict=PASS liboqs=cd08d930aa7d kyberpy=cd08d930aa7d
+malformed-all-ff             malformed    len= 1088 agree=True  verdict=PASS liboqs=2f9ec3fd2c3a kyberpy=2f9ec3fd2c3a
+malformed-random             malformed    len= 1088 agree=True  verdict=PASS liboqs=45b184a1adf9 kyberpy=45b184a1adf9
+malformed-random2            malformed    len= 1088 agree=True  verdict=PASS liboqs=a1610c413912 kyberpy=a1610c413912
+adversarial-cross-key        adversarial  len= 1088 agree=True  verdict=PASS liboqs=2d30b9579387 kyberpy=2d30b9579387
+adversarial-u-saturated      adversarial  len= 1088 agree=True  verdict=PASS liboqs=dfd9d8073331 kyberpy=dfd9d8073331
+adversarial-v-saturated      adversarial  len= 1088 agree=True  verdict=PASS liboqs=d23fafab923a kyberpy=d23fafab923a
+adversarial-u-zeroed         adversarial  len= 1088 agree=True  verdict=PASS liboqs=150a46194d01 kyberpy=150a46194d01
+
+-- valid encapsulation agreement, 20 rounds --
+valid rounds passed: 20/20
+
+-- determinism: 5 repeated decapsulations of the same inputs --
+valid: liboqs deterministic=True kyber-py deterministic=True cross-agree=True
+malformed-flip: liboqs deterministic=True kyber-py deterministic=True cross-agree=True
+
+-- input checks (FIPS 203 Sec. 7.3) --
+dk with corrupted stored H(ek): hash check passes=False
+  kyber-py: refused: Validation of decapsulation key or ciphertext failed: e = ValueError('hash check failed')
+  liboqs: refused: decaps returned -1
+  kyber-py dk-truncated-2399: refused: Validation of decapsulation key or ciphertext failed: e = ValueError('decapsulation type check failed. Expected 2400 bytes and obtained 2399')
+  liboqs dk-truncated-2399: refused: decapsulation key type check failed: expected 2400 bytes, got 2399
+  kyber-py dk-extended-2401: refused: Validation of decapsulation key or ciphertext failed: e = ValueError('decapsulation type check failed. Expected 2400 bytes and obtained 2401')
+  liboqs dk-extended-2401: refused: decapsulation key type check failed: expected 2400 bytes, got 2401
+
+-- timing: decapsulation latency, n=100 per cell --
+  liboqs    success n=100 median=0.025037ms p5=0.024958 p95=0.02518 mean=0.02535
+  liboqs    failure n=100 median=0.025028ms p5=0.024928 p95=0.026358 mean=0.025947
+  kyber-py  success n=100 median=7.433044ms p5=7.349009 p95=8.766325 mean=7.697598
+  kyber-py  failure n=100 median=7.477486ms p5=7.376567 p95=7.911753 mean=7.572443
+  liboqs: failure-success median delta = -0.000009 ms (success p95=0.02518ms, failure p95=0.026358ms)
+  kyber-py: failure-success median delta = +0.044442 ms (success p95=8.766325ms, failure p95=7.911753ms)
+
+=== SUMMARY ===
+cases: 19/19 PASS; disagreements: none
+valid rounds: 20/20; determinism ok: True
+overall: PASS
+
+results json: outputs/run2/results.json
