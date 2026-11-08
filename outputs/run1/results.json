@@ -1,0 +1,498 @@
+{
+  "env": {
+    "date_utc": "2026-11-08T15:06:50Z",
+    "platform": "Linux-7.0.0-43-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "cpu": "AMD EPYC 9D25 126-Core Processor",
+    "liboqs": "READY liboqs=0.16.0 alg=ML-KEM-768 ek=1184 dk=2400 ct=1088 ss=32",
+    "kyber_py": "1.2.0"
+  },
+  "cases": [
+    {
+      "case": "valid-001",
+      "category": "valid",
+      "description": "valid encapsulation from kyber-py",
+      "ct_len": 1088,
+      "ct_sha256": "8c8d5b6396bf8432b3d856db31d359521b80173d267be6f3046bab553d8ecde9",
+      "expected": "success",
+      "kyber_py": {
+        "ss_sha256": "a7f49c01736c4e6da7e1173cfce7b220b593d88ebdedfed3f2006d288290c58c",
+        "dt_ns": 7707481,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "a7f49c01736c4e6da7e1173cfce7b220b593d88ebdedfed3f2006d288290c58c",
+        "dt_ns": 44977,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-trunc-1087",
+      "category": "malformed",
+      "description": "truncated to 1087 bytes",
+      "ct_len": 1087,
+      "ct_sha256": "34d8932f2fdba8071f455251383f5ed45a1d184797abf334102b3e7442670334",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 1087')"
+      },
+      "liboqs": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: ciphertext type check failed: expected 1088 bytes, got 1087"
+      },
+      "cross_impl_agree": false,
+      "expected_fallback_sha256": null,
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-trunc-512",
+      "category": "malformed",
+      "description": "truncated to 512 bytes",
+      "ct_len": 512,
+      "ct_sha256": "7fe5b137211209a168d2117e311d3bff71af8a9569f82f2dcfec796a4b4174d8",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 512')"
+      },
+      "liboqs": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: ciphertext type check failed: expected 1088 bytes, got 512"
+      },
+      "cross_impl_agree": false,
+      "expected_fallback_sha256": null,
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-trunc-1",
+      "category": "malformed",
+      "description": "truncated to 1 byte",
+      "ct_len": 1,
+      "ct_sha256": "d16bd22f7196c0a70f4b12aa0b290c4c4acecd5d6ba350ecc8447fbdf4c3819b",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 1')"
+      },
+      "liboqs": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: ciphertext type check failed: expected 1088 bytes, got 1"
+      },
+      "cross_impl_agree": false,
+      "expected_fallback_sha256": null,
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-trunc-0",
+      "category": "malformed",
+      "description": "empty ciphertext (0 bytes)",
+      "ct_len": 0,
+      "ct_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 0')"
+      },
+      "liboqs": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: ciphertext type check failed: expected 1088 bytes, got 0"
+      },
+      "cross_impl_agree": false,
+      "expected_fallback_sha256": null,
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-ext-1089",
+      "category": "malformed",
+      "description": "extended by 1 byte",
+      "ct_len": 1089,
+      "ct_sha256": "e3aa8eaaf6828f568f8c183b0c2b4f8944a2e4b813b55c562da088855a6e54a5",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 1089')"
+      },
+      "liboqs": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: ciphertext type check failed: expected 1088 bytes, got 1089"
+      },
+      "cross_impl_agree": false,
+      "expected_fallback_sha256": null,
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-ext-2048",
+      "category": "malformed",
+      "description": "extended to 2048 bytes",
+      "ct_len": 2048,
+      "ct_sha256": "8a6201f5dad278f34da152906be81469abe9d772fbcf29ca104642c9452fafc8",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('ciphertext type check failed. Expected 1088 bytes and obtained 2048')"
+      },
+      "liboqs": {
+        "ss_sha256": null,
+        "dt_ns": null,
+        "error": "ValueError: ciphertext type check failed: expected 1088 bytes, got 2048"
+      },
+      "cross_impl_agree": false,
+      "expected_fallback_sha256": null,
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-flip-first",
+      "category": "malformed",
+      "description": "bit flip at byte 0",
+      "ct_len": 1088,
+      "ct_sha256": "1cf14d0e98ff9d1b9e5139a26fee665d5f09edbedc07e6ede28f62a7aabb13f6",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "62d928b25c633941253beed17b9a70390cc437ffe73b425671a6b2590aa2afca",
+        "dt_ns": 7678698,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "62d928b25c633941253beed17b9a70390cc437ffe73b425671a6b2590aa2afca",
+        "dt_ns": 57296,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "62d928b25c633941253beed17b9a70390cc437ffe73b425671a6b2590aa2afca",
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-flip-mid",
+      "category": "malformed",
+      "description": "bit flip at byte 543",
+      "ct_len": 1088,
+      "ct_sha256": "15d614da849977d6f4de8e26f0c9773f694e74a599b84e8764d570078ddd026b",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "e495d7b018e8a1b95aeb4a8a64e3427e8098cafe90006af8500c1dabb72a0e21",
+        "dt_ns": 7599480,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "e495d7b018e8a1b95aeb4a8a64e3427e8098cafe90006af8500c1dabb72a0e21",
+        "dt_ns": 31497,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "e495d7b018e8a1b95aeb4a8a64e3427e8098cafe90006af8500c1dabb72a0e21",
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-flip-last",
+      "category": "malformed",
+      "description": "bit flip at byte 1087",
+      "ct_len": 1088,
+      "ct_sha256": "36b26675db77cb9a8963d491bfd84741ecbbd40d0abdc695ebcf7c8c4b5e5397",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "92d57d52cef32582e5889913311130262c84574979324727489bc7d438e949c3",
+        "dt_ns": 7746840,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "92d57d52cef32582e5889913311130262c84574979324727489bc7d438e949c3",
+        "dt_ns": 40651,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "92d57d52cef32582e5889913311130262c84574979324727489bc7d438e949c3",
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-flip-vpart",
+      "category": "malformed",
+      "description": "bit flip at byte 1024 (v part)",
+      "ct_len": 1088,
+      "ct_sha256": "46c4efe0a380c2fa0d7328feafc3a3190545257afb582fb65719365dc4185cf4",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "5f0181f3c0b22616539b1f08d98b7ca1959b9c7e39e4c9001c05c17d7ec45443",
+        "dt_ns": 7721602,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "5f0181f3c0b22616539b1f08d98b7ca1959b9c7e39e4c9001c05c17d7ec45443",
+        "dt_ns": 39369,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "5f0181f3c0b22616539b1f08d98b7ca1959b9c7e39e4c9001c05c17d7ec45443",
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-all-zero",
+      "category": "malformed",
+      "description": "all-zero ciphertext",
+      "ct_len": 1088,
+      "ct_sha256": "0e40a09dd6c3d8b503c0095444488c25f0fa19356ddd9b77a16219cb1cec69e6",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "cd08d930aa7d1294adafa7f50ebd974068dabc9ae2c8df1b76f954c2cfe35908",
+        "dt_ns": 6854130,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "cd08d930aa7d1294adafa7f50ebd974068dabc9ae2c8df1b76f954c2cfe35908",
+        "dt_ns": 38308,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "cd08d930aa7d1294adafa7f50ebd974068dabc9ae2c8df1b76f954c2cfe35908",
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-all-ff",
+      "category": "malformed",
+      "description": "all-0xFF ciphertext",
+      "ct_len": 1088,
+      "ct_sha256": "769b7cd9026948adacd8471bc117a9a1ebb2cd7ed9c4fbfdfcd71a61c604ff48",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "2f9ec3fd2c3a94b718183e3b3f8c3177f1d55c4a65ac0425d3f9a23705f69877",
+        "dt_ns": 7494141,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "2f9ec3fd2c3a94b718183e3b3f8c3177f1d55c4a65ac0425d3f9a23705f69877",
+        "dt_ns": 30706,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "2f9ec3fd2c3a94b718183e3b3f8c3177f1d55c4a65ac0425d3f9a23705f69877",
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-random",
+      "category": "malformed",
+      "description": "seeded random bytes",
+      "ct_len": 1088,
+      "ct_sha256": "1af9a8386eead32a219ea19f0a4c0de5346aa2c1b64a8876f78557950ba41676",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "45b184a1adf939d77251a72fa49f1add3cb20f66638065b1c9424e274a0298ef",
+        "dt_ns": 7637116,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "45b184a1adf939d77251a72fa49f1add3cb20f66638065b1c9424e274a0298ef",
+        "dt_ns": 37786,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "45b184a1adf939d77251a72fa49f1add3cb20f66638065b1c9424e274a0298ef",
+      "verdict": "PASS"
+    },
+    {
+      "case": "malformed-random2",
+      "category": "malformed",
+      "description": "seeded random bytes (2nd draw)",
+      "ct_len": 1088,
+      "ct_sha256": "fb6c6486c887f0bcab062ba4467d2ba878c46ed87fcbd38de7e83810c6c39880",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "a1610c413912085ad625b8caf6309c8a6bca5d60e37d2eb49bdc3e8f97eda28e",
+        "dt_ns": 7533901,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "a1610c413912085ad625b8caf6309c8a6bca5d60e37d2eb49bdc3e8f97eda28e",
+        "dt_ns": 31788,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "a1610c413912085ad625b8caf6309c8a6bca5d60e37d2eb49bdc3e8f97eda28e",
+      "verdict": "PASS"
+    },
+    {
+      "case": "adversarial-cross-key",
+      "category": "adversarial",
+      "description": "valid ciphertext under a different encapsulation key",
+      "ct_len": 1088,
+      "ct_sha256": "a4d0f4e06d84129bab4729455ce2877f8b8ca5d6fd4715dc8ca2c0400a33ff0e",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "134e8fad03f632fa2d58a94a67dd982a1ab227bca7069de126d02187068af12a",
+        "dt_ns": 7585158,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "134e8fad03f632fa2d58a94a67dd982a1ab227bca7069de126d02187068af12a",
+        "dt_ns": 38147,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "134e8fad03f632fa2d58a94a67dd982a1ab227bca7069de126d02187068af12a",
+      "verdict": "PASS"
+    },
+    {
+      "case": "adversarial-u-saturated",
+      "category": "adversarial",
+      "description": "u part (first 960 bytes) set to 0xFF",
+      "ct_len": 1088,
+      "ct_sha256": "fd9fbdd28f05d8f088d75ef0e232c6a9678b2b1d0a719c702e0d7d49af22ef10",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "323342b9451a946ae1a62130a5241fda5f625a23d42db6c500f780b6a7e51870",
+        "dt_ns": 7556995,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "323342b9451a946ae1a62130a5241fda5f625a23d42db6c500f780b6a7e51870",
+        "dt_ns": 40341,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "323342b9451a946ae1a62130a5241fda5f625a23d42db6c500f780b6a7e51870",
+      "verdict": "PASS"
+    },
+    {
+      "case": "adversarial-v-saturated",
+      "category": "adversarial",
+      "description": "v part (last 128 bytes) set to 0xFF",
+      "ct_len": 1088,
+      "ct_sha256": "45e91f3911b05258bb6296fa6f1aa1d02703d633068f1c47602ad7adb120c044",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "dc5d55fd63aa350f818d409b3884bb0c6a417e593a0a1d2422d21cc244daeb8c",
+        "dt_ns": 7572389,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "dc5d55fd63aa350f818d409b3884bb0c6a417e593a0a1d2422d21cc244daeb8c",
+        "dt_ns": 30425,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "dc5d55fd63aa350f818d409b3884bb0c6a417e593a0a1d2422d21cc244daeb8c",
+      "verdict": "PASS"
+    },
+    {
+      "case": "adversarial-u-zeroed",
+      "category": "adversarial",
+      "description": "u part (first 960 bytes) set to 0x00",
+      "ct_len": 1088,
+      "ct_sha256": "d3084684f0bfcdb36612fd50cb549a7ef3732a51020f32932ce58c69c920d7dd",
+      "expected": "fallback",
+      "kyber_py": {
+        "ss_sha256": "ead92d7eb4f5c293ef74fe741fc075129440feff096e7698ade54c203037b305",
+        "dt_ns": 6868622,
+        "error": null
+      },
+      "liboqs": {
+        "ss_sha256": "ead92d7eb4f5c293ef74fe741fc075129440feff096e7698ade54c203037b305",
+        "dt_ns": 29404,
+        "error": null
+      },
+      "cross_impl_agree": true,
+      "expected_fallback_sha256": "ead92d7eb4f5c293ef74fe741fc075129440feff096e7698ade54c203037b305",
+      "verdict": "PASS"
+    }
+  ],
+  "input_checks": [
+    {
+      "check": "dk-hash-check/kyber-py",
+      "outcome": "refused",
+      "error": "ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('hash check failed')"
+    },
+    {
+      "check": "dk-hash-check/liboqs",
+      "outcome": "refused",
+      "error": "ValueError: decaps returned -1"
+    },
+    {
+      "check": "dk-truncated-2399/kyber-py",
+      "outcome": "refused",
+      "error": "ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('decapsulation type check failed. Expected 2400 bytes and obtained 2399')"
+    },
+    {
+      "check": "dk-truncated-2399/liboqs",
+      "outcome": "refused",
+      "error": "ValueError: decapsulation key type check failed: expected 2400 bytes, got 2399"
+    },
+    {
+      "check": "dk-extended-2401/kyber-py",
+      "outcome": "refused",
+      "error": "ValueError: Validation of decapsulation key or ciphertext failed: e = ValueError('decapsulation type check failed. Expected 2400 bytes and obtained 2401')"
+    },
+    {
+      "check": "dk-extended-2401/liboqs",
+      "outcome": "refused",
+      "error": "ValueError: decapsulation key type check failed: expected 2400 bytes, got 2401"
+    }
+  ],
+  "timing": {
+    "liboqs-success": {
+      "n": 100,
+      "median_ms": 0.024808,
+      "p5_ms": 0.024736,
+      "p95_ms": 0.033586,
+      "mean_ms": 0.02561,
+      "min_ms": 0.024657,
+      "max_ms": 0.040631
+    },
+    "liboqs-failure": {
+      "n": 100,
+      "median_ms": 0.024802,
+      "p5_ms": 0.024737,
+      "p95_ms": 0.033399,
+      "mean_ms": 0.025667,
+      "min_ms": 0.024717,
+      "max_ms": 0.038668
+    },
+    "kyber-py-success": {
+      "n": 100,
+      "median_ms": 7.557161,
+      "p5_ms": 7.492513,
+      "p95_ms": 9.475211,
+      "mean_ms": 7.727128,
+      "min_ms": 7.487,
+      "max_ms": 10.244521
+    },
+    "kyber-py-failure": {
+      "n": 100,
+      "median_ms": 7.579589,
+      "p5_ms": 7.51031,
+      "p95_ms": 7.976014,
+      "mean_ms": 7.657595,
+      "min_ms": 7.489454,
+      "max_ms": 9.700845
+    },
+    "liboqs-delta-median-ms": -6e-06,
+    "kyber-py-delta-median-ms": 0.022428
+  },
+  "summary": {
+    "valid_rounds_pass": 20,
+    "valid_rounds_total": 20,
+    "determinism_ok": true,
+    "cases_total": 19,
+    "cases_pass": 19,
+    "cases_fail": 0,
+    "disagreements": [],
+    "failures": []
+  },
+  "keypair": {
+    "ek_sha256": "dd61cf5a492e66f67cfe00105c51e29d8a0d6f1f410d78206ac5d10feb7601f7",
+    "dk_sha256": "bbcbe321dfd661ce55fba4af33586930ad99368a9c75ec73a49594a4b4125e3b",
+    "z_sha256": "cf9b506a0b0d8337e045cb2f3203bfcc1a037263de07171d031c8033eb1f8186",
+    "dk_hash_check": true
+  }
+}
